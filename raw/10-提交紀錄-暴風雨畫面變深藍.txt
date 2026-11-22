@@ -1,0 +1,32 @@
+commit 432fe16
+Date: 2026-11-14 21:16:25 +0800
+
+修正暴風雨開船時畫面一半變深藍：人在船上時鏡頭不准低於水面
+
+浪頭高過小舢舨上坐著、掌舵的眼睛時，鏡頭被當成在水裡，水線把畫面切成一半、另一半是水底的深藍。
+掌舵、坐著、站在甲板上（船沒在沉）時，鏡頭至少高出水面 CAM_ABOVE_WATER（0.35 公尺）。
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+----
+commit 9804271
+Date: 2026-11-14 21:21:47 +0800
+
+改回：拿掉「人在船上時鏡頭不准低於水面」（432fe16）
+
+那次判斷錯了，暴風雨破圖的真正原因是飛沫算出 NaN（5b8aaca 已修）
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+----
+commit 5b8aaca
+Date: 2026-11-14 21:20:42 +0800
+
+修正暴風雨時畫面整片或半片變深藍：風吹飛沫的著色器算出 NaN，被光暈擴散成整個畫面
+
+- 飛沫（Spindrift）：pow(1-u) 的 u 內插超過 1 一點點時是 pow(負數) = NaN；smoothstep 的邊界前大後小（規格沒定義）。都改掉
+- 光暈的輸入先丟掉 NaN、無限大的像素：以後哪個效果再算出一點 NaN，也不會被擴散成整片
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+----

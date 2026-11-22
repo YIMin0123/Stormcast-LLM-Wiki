@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 團隊怎麼寫遊戲</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#e9eef1; --paper:#fbfcfd; --ink:#16232d; --mute:#5a6874; --line:#d5dee4;
+  --sea:#0f6f8c; --sea2:#e2f1f6; --sun:#e08a1e; --sun2:#fdf0de; --red:#c2443f; --red2:#fbe6e4; --leaf:#3c7d3a; --leaf2:#e5f2e2;
+  --code:#eef2f5;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0c1318; --paper:#141e25; --ink:#e4ebf0; --mute:#9aa9b4; --line:#2a3943;
+    --sea:#4fb3d1; --sea2:#15303b; --sun:#f0a447; --sun2:#3a2a14; --red:#ec7a73; --red2:#3b1d1b; --leaf:#7cc078; --leaf2:#1b301a; --code:#1d2a33;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0c1318; --paper:#141e25; --ink:#e4ebf0; --mute:#9aa9b4; --line:#2a3943;
+  --sea:#4fb3d1; --sea2:#15303b; --sun:#f0a447; --sun2:#3a2a14; --red:#ec7a73; --red2:#3b1d1b; --leaf:#7cc078; --leaf2:#1b301a; --code:#1d2a33;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;overflow:hidden}
+.stage{position:fixed;left:50%;top:50%;width:1280px;height:720px;transform-origin:center;}
+.slide{position:absolute;inset:0;background:var(--paper);border-radius:18px;box-shadow:0 10px 40px rgba(0,0,0,.12);padding:56px 72px 64px;display:none;flex-direction:column;overflow:hidden}
+.slide.on{display:flex}
+.kicker{font-size:18px;font-weight:700;color:var(--sea);letter-spacing:.08em;margin-bottom:10px}
+h1{font-size:60px;line-height:1.2;font-weight:900}
+h2{font-size:42px;line-height:1.25;font-weight:900;margin-bottom:26px}
+h3{font-size:24px;margin-bottom:10px}
+p,li{font-size:24px;line-height:1.6}
+.lead{font-size:28px;line-height:1.6;color:var(--mute)}
+ul{padding-left:1.2em}
+li+li{margin-top:8px}
+code{font-family:Consolas,"Cascadia Mono",monospace;background:var(--code);padding:1px 7px;border-radius:6px;font-size:.88em}
+dfn{font-style:normal;font-weight:700;color:var(--sea)}
+b,strong{font-weight:900}
+.src{position:absolute;left:72px;right:72px;bottom:22px;font-size:15px;color:var(--mute);display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:10px}
+.src a{color:var(--sea);text-decoration:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card{background:var(--bg);border-radius:14px;padding:22px 24px}
+.card p,.card li{font-size:21px}
+.card h3{font-size:25px}
+.tag{display:inline-block;font-size:15px;font-weight:700;padding:3px 10px;border-radius:99px;margin-bottom:10px}
+.t-sea{background:var(--sea2);color:var(--sea)} .t-sun{background:var(--sun2);color:var(--sun)} .t-red{background:var(--red2);color:var(--red)} .t-leaf{background:var(--leaf2);color:var(--leaf)}
+.big{font-size:64px;font-weight:900;color:var(--sea);line-height:1}
+.stat{background:var(--bg);border-radius:14px;padding:20px 22px}
+.stat small{display:block;font-size:18px;color:var(--mute);margin-top:8px}
+table{border-collapse:collapse;width:100%;font-size:21px}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.45}
+th{color:var(--mute);font-size:17px;font-weight:700}
+.flow{display:flex;align-items:stretch;gap:10px}
+.flow .step{flex:1;background:var(--bg);border-radius:12px;padding:14px 14px;font-size:19px;line-height:1.45;position:relative}
+.flow .step b{display:block;font-size:20px;margin-bottom:4px}
+.flow .arr{align-self:center;color:var(--mute);font-size:26px}
+.quote{border-left:5px solid var(--sun);padding:6px 0 6px 18px;font-size:24px;color:var(--ink);background:var(--sun2);border-radius:0 10px 10px 0}
+.cover{background:linear-gradient(90deg,rgba(9,30,40,.88) 0%,rgba(9,30,40,.55) 55%,rgba(9,30,40,.1) 100%),url(img/遊戲_大港灣島.jpg) center/cover;color:#fff;justify-content:center}
+.cover .kicker{color:#9fdcf0}
+.cover .lead{color:#d6e6ee}
+.cover .src{color:#b6c8d2;border-color:rgba(255,255,255,.25)}
+.shot{width:100%;height:100%;object-fit:cover;border-radius:14px;display:block}
+.nav{position:fixed;bottom:14px;right:18px;display:flex;gap:8px;align-items:center;font-size:14px;color:var(--mute);z-index:9}
+.nav button{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:8px;width:38px;height:34px;font-size:16px;cursor:pointer}
+.bar{position:fixed;left:0;top:0;height:4px;background:var(--sea);transition:width .25s;z-index:9}
+.answer{display:none;color:var(--leaf);font-weight:700}
+.reveal .answer{display:inline}
+</style>
+</head>
+<body>
+<div class="bar" id="bar"></div>
+<div class="stage" id="stage">
+
+<!-- 1 封面 -->
+<section class="slide cover" data-wiki="多AI協作總覽">
+  <div class="kicker">生成式 AI 教學簡報 ・ 第十週</div>
+  <h1>AI 團隊怎麼<br>一起寫出一款遊戲？</h1>
+  <p class="lead" style="margin-top:22px;max-width:640px">以 3D 線上釣魚遊戲 Stormcast 為例：<br>好幾個 AI 輪流開發時，怎麼交接、怎麼互相檢查、出錯了怎麼辦</p>
+  <p style="margin-top:34px;font-size:20px;color:#d6e6ee">朝陽科大 資通系 吳翊銘 ・ 內容全部來自自己建的 LLM Wiki</p>
+</section>
+
+<!-- 2 問題 -->
+<section class="slide" data-wiki="多AI協作總覽">
+  <div class="kicker">先想一個問題</div>
+  <h2>六個人輪流寫同一份報告，<br>但每個人都<span style="color:var(--red)">看不到</span>前一個人說過的話……</h2>
+  <div class="grid3" style="margin-top:10px">
+    <div class="card"><span class="tag t-red">會發生</span><p>A 寫到一半，B 不知道，從頭重寫一次</p></div>
+    <div class="card"><span class="tag t-red">會發生</span><p>A 踩過的坑，B 又踩一次</p></div>
+    <div class="card"><span class="tag t-red">會發生</span><p>A 和 B 同時改同一段，互相蓋掉</p></div>
+  </div>
+  <p class="lead" style="margin-top:34px">這不是假設：好幾個 AI 一起寫程式時，遇到的就是這個問題。</p>
+</section>
+
+<!-- 3 Stormcast -->
+<section class="slide" data-wiki="多AI協作總覽">
+  <div class="kicker">今天的例子</div>
+  <h2>Stormcast：幾乎全由 AI 寫出來的線上遊戲</h2>
+  <div class="grid2" style="grid-template-columns:1.15fr 1fr;flex:1;min-height:0">
+    <img class="shot" src="img/遊戲_多人碼頭.jpg" alt="Stormcast 遊戲畫面：多位玩家在碼頭">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-content:start">
+      <div class="stat"><div class="big">819</div><small>次提交（存檔點）</small></div>
+      <div class="stat"><div class="big">247</div><small>篇 AI 交接日誌</small></div>
+      <div class="stat"><div class="big">12</div><small>份審查報告</small></div>
+      <div class="stat"><div class="big">80</div><small>個自動測試檔</small></div>
+      <div class="stat" style="grid-column:1/-1"><p style="font-size:20px">開發期間 2026-11-12 到 2026-11-23。<br>寫過日誌的 AI：Claude Opus、Sonnet、Fable、Codex、Gemini、Antigravity</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 AI Agent -->
+<section class="slide" data-wiki="名詞表,多AI協作總覽">
+  <div class="kicker">基本概念</div>
+  <h2>什麼是 AI Agent？</h2>
+  <div class="grid2">
+    <div class="card">
+      <span class="tag t-sea">聊天機器人</span>
+      <h3>你問、它答</h3>
+      <ul><li>只會產生文字</li><li>程式碼要你自己複製、貼上、執行</li><li>錯了要你告訴它</li></ul>
+    </div>
+    <div class="card" style="outline:3px solid var(--sea)">
+      <span class="tag t-leaf">AI Agent（AI 代理）</span>
+      <h3>你交代、它動手</h3>
+      <ul><li>自己讀檔案、改程式</li><li>自己跑指令、看結果</li><li>看到錯誤再決定下一步</li></ul>
+    </div>
+  </div>
+  <p class="lead" style="margin-top:28px">Claude Code、Codex 都是這一類。Stormcast 就是好幾個 AI Agent 輪流改同一個資料夾寫出來的。</p>
+</section>
+
+<!-- 5 難題 -->
+<section class="slide" data-wiki="多AI協作總覽,共用記憶">
+  <div class="kicker">最大的難題</div>
+  <h2>每個 AI 都會「失憶」</h2>
+  <div class="grid2" style="align-items:start">
+    <div>
+      <ul>
+        <li>每開一段新對話，AI 就不記得上次做過什麼</li>
+        <li>不同的 AI <b>看不到彼此的對話</b></li>
+        <li>它們唯一共用的，是同一個<b>專案資料夾</b></li>
+      </ul>
+    </div>
+    <div class="quote">「所有 AI 共用同一個資料夾，卻看不到彼此的對話。」<br><span style="font-size:18px;color:var(--mute)">— 專案的日誌說明</span></div>
+  </div>
+  <p class="lead" style="margin-top:40px">所以答案是：<b style="color:var(--ink)">把要記住的事寫成檔案，放進資料夾</b>。<br>每個 AI 開工前都先讀這些檔案，這叫做 <dfn>共用記憶</dfn>。</p>
+</section>
+
+<!-- 6 三層 -->
+<section class="slide" data-wiki="共用記憶">
+  <div class="kicker">解法</div>
+  <h2>三層共用記憶，各管各的</h2>
+  <div class="grid3">
+    <div class="card"><span class="tag t-sea">規則</span><h3>CLAUDE.md</h3><p>這裡能做什麼、不能做什麼？</p><p style="color:var(--mute);margin-top:8px">像員工守則・很少變</p></div>
+    <div class="card"><span class="tag t-sun">現況</span><h3>工程架構手冊</h3><p>現在的程式長怎樣？哪個檔管什麼？</p><p style="color:var(--mute);margin-top:8px">像一張隨時更新的地圖</p></div>
+    <div class="card"><span class="tag t-leaf">交接</span><h3>交接日誌</h3><p>最近誰做了什麼、做到哪？</p><p style="color:var(--mute);margin-top:8px">像交班筆記・一個任務一篇</p></div>
+  </div>
+  <p class="lead" style="margin-top:30px">三層<b style="color:var(--ink)">不重複</b>：日誌只寫「變化和原因」，現況寫在手冊；手冊只寫「現在」，歷史交給 <code>git log</code>。</p>
+</section>
+
+<!-- 7 CLAUDE.md -->
+<section class="slide" data-wiki="CLAUDE-md">
+  <div class="kicker">第一層・規則</div>
+  <h2>CLAUDE.md：所有 AI 都要遵守的規則</h2>
+  <table>
+    <tr><th style="width:22%">類別</th><th>規則</th></tr>
+    <tr><td>範圍</td><td>大改動前先跟使用者確認，只做講好的範圍</td></tr>
+    <tr><td>多人同時改</td><td>改前先讀現行檔案；提交時清單只能有自己的檔</td></tr>
+    <tr><td>測試</td><td>另開 <code>?test</code> 分頁，不動使用者正在玩的那頁</td></tr>
+    <tr><td>上線</td><td><b>使用者說了才上線，也不要主動問</b></td></tr>
+    <tr><td>安全</td><td>不准提交密鑰、<code>.env</code>、玩家資料</td></tr>
+    <tr><td>交接</td><td>靠 <code>docs/日誌/</code>，開工前先讀最後幾篇</td></tr>
+  </table>
+</section>
+
+<!-- 8 手冊 -->
+<section class="slide" data-wiki="工程架構手冊">
+  <div class="kicker">第二層・現況</div>
+  <h2>工程架構手冊：踩過的坑，變成鐵律</h2>
+  <div class="grid2">
+    <div>
+      <p>手冊第一句話：</p>
+      <div class="quote" style="margin:10px 0 22px">「這是一份『活的現況地圖』。」</div>
+      <p>五章：世界現況、開發速查、模組地圖、<b>鐵律與踩坑紀錄</b>、文件維護協定。</p>
+    </div>
+    <div class="card">
+      <span class="tag t-red">鐵律的例子</span>
+      <h3>海床圖要分兩張</h3>
+      <p><code>bed</code> 含海上礁石（給船擱淺用），<code>main</code> 只含兩座大島。混在一起的話，外海風暴消失、鮪魚釣不到。</p>
+      <p style="margin-top:12px;color:var(--mute)">踩到大坑並修好 → 濃縮成 2～3 行規則寫進手冊，下一個 AI 就不會再踩。</p>
+    </div>
+  </div>
+</section>
+
+<!-- 9 日誌 -->
+<section class="slide" data-wiki="交接日誌">
+  <div class="kicker">第三層・交接</div>
+  <h2>一篇交接日誌的一生</h2>
+  <div class="flow">
+    <div class="step"><span class="tag t-sun">開工</span><b>建檔：「進行中」</b>寫下會動到哪些檔案，別的 AI 馬上看得到、會避開</div>
+    <div class="arr">→</div>
+    <div class="step"><span class="tag t-sea">提交</span><b>改成「已提交」</b>補寫改了什麼、為什麼、踩到的坑、沒解決的事</div>
+    <div class="arr">→</div>
+    <div class="step"><span class="tag t-leaf">上線</span><b>改成「已上線」</b>寫上日期</div>
+  </div>
+  <div class="grid2" style="margin-top:28px">
+    <div class="card"><h3>最重要的一欄：要知道的事</h3><p>坑、刻意的設計，還有<b>驗證了什麼、沒驗證什麼</b>。下一個 AI 才知道哪裡還沒測。</p></div>
+    <div class="card"><h3>防卡死</h3><p>「進行中」超過一天視為過期，可以忽略，避免當掉的 AI 一直佔著檔案。</p></div>
+  </div>
+</section>
+
+<!-- 10 迴圈 -->
+<section class="slide" data-wiki="開發迴圈">
+  <div class="kicker">把它們串起來</div>
+  <h2>開發迴圈：一個需求從提出到上線</h2>
+  <div class="flow" style="margin-bottom:16px">
+    <div class="step"><b>① 讀共用記憶</b>規則、手冊、最近的日誌</div><div class="arr">→</div>
+    <div class="step"><b>② 確認範圍</b>大改動先問人</div><div class="arr">→</div>
+    <div class="step"><b>③ 開日誌</b>標「進行中」</div><div class="arr">→</div>
+    <div class="step" style="outline:3px solid var(--sun)"><b>④ 改程式</b></div><div class="arr">⇄</div>
+    <div class="step" style="outline:3px solid var(--sun)"><b>⑤ 測試</b>自動測試＋實際打開看</div>
+  </div>
+  <div class="flow">
+    <div class="step"><b>⑥ 提交</b>日誌跟程式同一次存檔；改到結構就更新手冊</div><div class="arr">→</div>
+    <div class="step"><b>⑦ 審查</b>（人說才做）別的 AI 挑錯 → 回 ④</div><div class="arr">→</div>
+    <div class="step"><b>⑧ 上線</b>（人說才做）上線前後各檢查一次</div>
+  </div>
+  <p class="lead" style="margin-top:22px;font-size:24px">會重複的：<b style="color:var(--ink)">④⑤</b> 最內圈（改→測→不對再改）、<b style="color:var(--ink)">⑦→④</b>、整圈（下一個 AI 讀上一個 AI 的日誌）。</p>
+</section>
+
+<!-- 11 審查 -->
+<section class="slide" data-wiki="審查流程">
+  <div class="kicker">節點 ⑦</div>
+  <h2>審查：讓別的 AI 來挑錯</h2>
+  <div class="flow" style="margin-bottom:24px">
+    <div class="step"><b>主 AI 寫說明</b>審什麼、使用者原話、規則</div><div class="arr">→</div>
+    <div class="step"><b>codex、agy 各自審</b>互相看不到、只看不改</div><div class="arr">→</div>
+    <div class="step"><b>主 AI 回程式驗證</b>成立／待確認／不成立</div><div class="arr">→</div>
+    <div class="step"><b>使用者挑</b>要修哪幾條才動手</div>
+  </div>
+  <div class="card">
+    <span class="tag t-sun">實際跑一次：風景升級（2026-11-21）</span>
+    <p>報告共 <b>26</b> 條。第 1 條「開相機後滑鼠被鎖住，按鈕全部點不到」兩方都抓到，作者 AI 承認：</p>
+    <div class="quote" style="margin-top:10px">「我自己測的時候只用了鍵盤和第三人稱，所以漏掉了。」</div>
+  </div>
+</section>
+
+<!-- 12 上線 -->
+<section class="slide" data-wiki="上線流程">
+  <div class="kicker">節點 ⑧</div>
+  <h2>上線：最後一關由人決定</h2>
+  <div class="grid2">
+    <div class="card"><span class="tag t-sea">上線前（AI 做）</span><ul><li>跑全部自動測試，<b>有失敗就停</b></li><li>列出這次要上線的改動給人看</li><li>看線上有多少玩家</li></ul></div>
+    <div class="card"><span class="tag t-leaf">上線後（AI 做）</span><ul><li>看伺服器有沒有錯誤</li><li>在正式網站實際看一次</li><li>日誌改成「已上線」</li></ul></div>
+  </div>
+  <p class="lead" style="margin-top:26px">有玩家在線上時：跑馬燈倒數 60 秒，歸零才重開，玩家只中斷一次。<br><b style="color:var(--ink)">按下上線的永遠是人</b>，因為它會影響真的在玩的玩家。</p>
+</section>
+
+<!-- 13 案例1 -->
+<section class="slide" data-wiki="案例-白畫面">
+  <div class="kicker" style="color:var(--red)">出錯案例 1・2026-11-16</div>
+  <h2>改了程式，整個遊戲進不去</h2>
+  <div class="grid2">
+    <div>
+      <h3>發生什麼事</h3>
+      <p>進遊戲只剩深藍底，什麼都看不到。主控台寫著：</p>
+      <p style="margin:8px 0 18px"><code style="font-size:18px">Cannot access 'dexBook' before initialization</code></p>
+      <h3>原因</h3>
+      <p>Antigravity 的改動讓價格牌去讀 <code>dexBook</code>，但遊戲一載入就先畫價格牌，那時它還沒建好。<br>白話：<b>還沒開抽屜就要拿東西</b>。</p>
+    </div>
+    <div class="card">
+      <span class="tag t-leaf">怎麼修、學到什麼</span>
+      <ul><li>Claude Sonnet 把宣告搬到前面</li><li>驗證：重新打開，進得去、沒錯誤</li><li>日誌誠實寫「沒有實測買頭銜、改裝」</li><li><b>檢查往前移</b>：改完就要真的打開遊戲看，不能只看程式碼</li></ul>
+    </div>
+  </div>
+</section>
+
+<!-- 14 案例2 -->
+<section class="slide" data-wiki="案例-人物變白">
+  <div class="kicker" style="color:var(--red)">出錯案例 2・2026-11-17</div>
+  <h2>本機正常，正式網站的人物全變白</h2>
+  <div class="flow" style="margin-bottom:22px">
+    <div class="step"><span class="tag t-sea">Codex</span><b>加強安全</b>加了一條 CSP 規則，限制網頁能從哪裡讀資料</div><div class="arr">→</div>
+    <div class="step"><span class="tag t-red">副作用</span><b>貼圖被擋</b>人物貼圖用 <code>blob:</code> 網址讀，沒被放行</div><div class="arr">→</div>
+    <div class="step"><span class="tag t-red">更糟</span><b>沒有任何錯誤訊息</b>Three.js 讀不到貼圖不會報錯</div><div class="arr">→</div>
+    <div class="step"><span class="tag t-leaf">Sonnet 修好</span><b>放行 <code>blob: data:</code></b>並在手冊寫下為什麼不能拿掉</div>
+  </div>
+  <div class="quote">每個 AI 各自做對的事，合在一起可能出錯。<br><span style="font-size:20px">→ 改安全規則要先在正式網址實測；上線後要在正式網站實際看一次。</span></div>
+</section>
+
+<!-- 15 案例3 -->
+<section class="slide" data-wiki="案例-暴風雨誤判">
+  <div class="kicker" style="color:var(--red)">出錯案例 3・2026-11-14</div>
+  <h2>AI 先猜錯原因，改回來，再找到真正的錯</h2>
+  <table style="margin-bottom:20px">
+    <tr><th style="width:12%">時間</th><th style="width:14%">提交</th><th>做了什麼</th></tr>
+    <tr><td>21:16</td><td><code>432fe16</code></td><td><b>第一次判斷</b>：以為浪太高、鏡頭跑進水裡</td></tr>
+    <tr><td>21:20</td><td><code>5b8aaca</code></td><td><b>真正原因</b>：飛沫的著色器算出 NaN，被光暈擴散成整個畫面</td></tr>
+    <tr><td>21:21</td><td><code>9804271</code></td><td><b>改回</b>第一次的修法：「那次判斷錯了」</td></tr>
+  </table>
+  <div class="grid2">
+    <div class="card"><h3>AI 會自信地猜錯</h3><p>看到症狀很快提出「聽起來合理」的原因，但修的是症狀不是原因。</p></div>
+    <div class="card"><h3>修兩層</h3><p>改掉算錯的地方，<b>再加一道防線</b>：光暈先丟掉 NaN，同類錯不會再擴散。</p></div>
+  </div>
+</section>
+
+<!-- 16 往前移 -->
+<section class="slide" data-wiki="開發迴圈,docLint">
+  <div class="kicker">最重要的一課</div>
+  <h2>每出一次錯，就把檢查往前移</h2>
+  <table>
+    <tr><th>案例</th><th>原本在哪發現</th><th>之後檢查放在哪</th></tr>
+    <tr><td>白畫面</td><td>使用者自己打開才發現</td><td>⑤ 改完就開測試分頁進遊戲看</td></tr>
+    <tr><td>人物變白</td><td>上線後玩家看到</td><td>⑧ 正式網址實測、上線後實際看</td></tr>
+    <tr><td>暴風雨誤判</td><td>修完才發現修錯</td><td>下游加防線，同類錯不擴散</td></tr>
+    <tr><td>手冊過時</td><td>下一個 AI 被錯的手冊誤導</td><td>⑥ 提交前跑 <code>docLint</code> 檢查手冊</td></tr>
+  </table>
+  <p class="lead" style="margin-top:22px;font-size:24px"><dfn>docLint</dfn>：把手冊裡寫的檔名、函式名一個個到程式裡找，找不到就是手冊過時了。第一次跑就抓到 <code>marqCrown</code> 早已改名 <code>marqPush</code>。</p>
+</section>
+
+<!-- 17 小結 -->
+<section class="slide" data-wiki="開發迴圈,共用記憶">
+  <div class="kicker">小結</div>
+  <h2>三個重點</h2>
+  <div class="grid3" style="margin-bottom:26px">
+    <div class="card"><span class="tag t-sea">1</span><h3>寫下來</h3><p>AI 會失憶，要記住的事寫成檔案：規則、現況、交接三層。</p></div>
+    <div class="card"><span class="tag t-sun">2</span><h3>跑成迴圈</h3><p>讀 → 改 → 測 → 提交 → 審查 → 上線，下一個 AI 接著跑。</p></div>
+    <div class="card"><span class="tag t-leaf">3</span><h3>檢查往前移</h3><p>每出一次錯，就把檢查放到離錯最近的節點。</p></div>
+  </div>
+  <h3>自我檢查（點一下看答案）</h3>
+  <ol style="padding-left:1.3em" id="quiz">
+    <li style="font-size:21px">AI 之間看不到對話，靠什麼交接？ <span class="answer">交接日誌（docs/日誌/）</span></li>
+    <li style="font-size:21px">為什麼「上線」一定要人說了才做？ <span class="answer">會影響真的在玩的玩家</span></li>
+    <li style="font-size:21px">人物變白的錯，為什麼本機看不出來？ <span class="answer">那條安全規則只在正式網站有</span></li>
+  </ol>
+</section>
+
+<!-- 18 來源 -->
+<section class="slide" data-wiki="index">
+  <div class="kicker">資料來源</div>
+  <h2>這份簡報用到的 Wiki 頁</h2>
+  <p style="font-size:20px;color:var(--mute);margin-bottom:14px">每張投影片右下角都標了它用的 Wiki 頁。Wiki 由 12 份 Stormcast 專案的真實資料整理而成。</p>
+  <div id="map" style="columns:2;column-gap:40px;font-size:19px;line-height:1.7"></div>
+</section>
+
+</div>
+<div class="nav"><button id="prev" aria-label="上一張">◀</button><span id="num"></span><button id="next" aria-label="下一張">▶</button></div>
+<script>
+const slides = [...document.querySelectorAll('.slide')];
+const WIKI = 'https://github.com/YIMin0123/Stormcast-LLM-Wiki/blob/main/wiki/';
+slides.forEach((s, i) => {
+  const pages = s.dataset.wiki.split(',');
+  const f = document.createElement('div');
+  f.className = 'src';
+  f.innerHTML = `<span>📚 Wiki：${pages.map((p) => `<a href="${WIKI}${encodeURIComponent(p)}.md" target="_blank">${p}</a>`).join('・')}</span><span>${i + 1} / ${slides.length}</span>`;
+  s.appendChild(f);
+});
+document.getElementById('map').innerHTML = slides.slice(0, -1).map((s, i) =>
+  `<div>${i + 1}. ${s.querySelector('h1,h2').textContent.replace(/\s+/g, '')} → ${s.dataset.wiki.replace(/,/g, '、')}</div>`).join('');
+let cur = Math.max(0, Math.min(slides.length - 1, (parseInt(location.hash.slice(1)) || 1) - 1));
+function show(n) {
+  cur = Math.max(0, Math.min(slides.length - 1, n));
+  slides.forEach((s, i) => s.classList.toggle('on', i === cur));
+  document.getElementById('num').textContent = `${cur + 1} / ${slides.length}`;
+  document.getElementById('bar').style.width = `${(cur + 1) / slides.length * 100}%`;
+  history.replaceState(null, '', '#' + (cur + 1));
+}
+function fit() {
+  const k = Math.min(innerWidth / 1320, innerHeight / 760);
+  document.getElementById('stage').style.transform = `translate(-50%,-50%) scale(${k})`;
+}
+addEventListener('resize', fit); fit(); show(cur);
+addEventListener('keydown', (e) => {
+  if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); show(cur + 1); }
+  if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); show(cur - 1); }
+  if (e.key === 'Home') show(0);
+  if (e.key === 'End') show(slides.length - 1);
+});
+document.getElementById('prev').onclick = () => show(cur - 1);
+document.getElementById('next').onclick = () => show(cur + 1);
+document.getElementById('quiz').onclick = (e) => { const li = e.target.closest('li'); if (li) li.classList.toggle('reveal'); };
+let tx = null;
+addEventListener('touchstart', (e) => { tx = e.touches[0].clientX; }, { passive: true });
+addEventListener('touchend', (e) => { if (tx === null) return; const d = e.changedTouches[0].clientX - tx; if (Math.abs(d) > 50) show(cur + (d < 0 ? 1 : -1)); tx = null; });
+</script>
+</body>
+</html>
