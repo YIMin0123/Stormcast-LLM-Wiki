@@ -7,16 +7,16 @@
 
 ## 主題
 
-Stormcast 是一款瀏覽器 3D 線上多人釣魚遊戲，由 Claude、Codex、Gemini、Antigravity 等好幾個 AI 輪流開發（12 天、819 次提交、247 篇交接日誌）。AI 之間看不到彼此的對話，靠什麼交接？怎麼互相檢查？出過什麼錯？這份 Wiki 從專案裡 12 份真實資料整理出答案，再用 Wiki 做成一份給沒寫過程式的人看的教學簡報。
+Stormcast 是一款瀏覽器 3D 線上多人釣魚遊戲，由 Claude、Codex、Gemini、Antigravity 等好幾個 AI 輪流開發（12 天、819 次提交、247 篇交接日誌）。AI 之間看不到彼此的對話，靠什麼交接？怎麼互相檢查？出過什麼錯？這份 Wiki 從專案裡 14 份真實資料整理出答案，再用 Wiki 做成一份給沒寫過程式的人看的教學簡報。
 
 ## 資料夾
 
 ```
-raw/        12 份原始資料（從 Stormcast 專案原樣複製，唯讀）
-wiki/       AI 整理的 Wiki：13 頁內容＋index、log、SCHEMA（規則）
-slides/     教學 HTML 簡報（18 張，單一檔案）
+raw/        14 份原始資料（從 Stormcast 專案原樣複製，唯讀）
+wiki/       AI 整理的 Wiki：14 頁內容＋index、log、SCHEMA（規則）
+slides/     教學 HTML 簡報（15 張，單一檔案；有 Stormcast 實機畫面）
 tools/      三支檢查程式＋共用術語清單
-紀錄/       討論紀錄、兩版大綱、每次檢查的完整輸出、18 張截圖
+紀錄/       討論紀錄、三版大綱、每次檢查的完整輸出、使用者回饋、15 張截圖、舊版簡報
 流程設計.md  loop / graph 設計
 反思.md     哪個節點最常出錯、檢查往前移到哪裡
 ```
@@ -24,7 +24,7 @@ tools/      三支檢查程式＋共用術語清單
 ## 流程
 
 ```
-討論 → Ingest → [wiki_lint] → Query（大綱）→ [outline_check] → 生成簡報 → [slide_check] → [人工看截圖] → 發佈
+討論 → Ingest → [wiki_lint] → Query（大綱）→ [outline_check] → 生成簡報 → [slide_check] → [人工看截圖] → 發佈 → [使用者看成品]
 ```
 
 詳見 [流程設計.md](流程設計.md)，實際執行的紀錄在 [紀錄/](紀錄/)，反思在 [反思.md](反思.md)。
@@ -35,8 +35,8 @@ tools/      三支檢查程式＋共用術語清單
 
 ```bash
 node tools/wiki_lint.mjs
-node tools/outline_check.mjs 紀錄/08-簡報大綱-v2.md
-node tools/slide_check.mjs --outline 紀錄/08-簡報大綱-v2.md --shots
+node tools/outline_check.mjs 紀錄/14-簡報大綱-v3.md
+node tools/slide_check.mjs --outline 紀錄/14-簡報大綱-v3.md --shots
 ```
 
 ## 原始資料出處
@@ -57,3 +57,7 @@ node tools/slide_check.mjs --outline 紀錄/08-簡報大綱-v2.md --shots
 | 10-提交紀錄-暴風雨畫面變深藍.txt | `git show 432fe16 9804271 5b8aaca` |
 | 11-docLint.mjs | `tools/docLint.mjs` |
 | 12-日誌作者與提交統計.md | 用 `grep`、`git rev-list` 等指令產生（指令寫在檔案裡） |
+| 13-日誌-審查頁.md | `docs/日誌/2026-11-23-審查頁.md` |
+| 14-日誌-船漆改版與看船工具.md | `docs/日誌/2026-11-23-船漆改版與看船工具.md` |
+
+簡報裡的實機畫面：`slides/img/遊戲_*.jpg` 是遊戲截圖；`slides/img/檢視頁_*.jpg`、`角色模型並排.jpg` 截自 Stormcast 的 `/boats.html`、`/models.html`、`/props.html`。

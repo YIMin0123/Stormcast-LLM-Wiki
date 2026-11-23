@@ -5,6 +5,7 @@
 //   1. 對應：每張投影片都有 data-wiki，列的頁都存在於 wiki/
 //   2. 事實：投影片上的數字（兩位數以上）、提交編號、<code> 內容，都要在它列的 Wiki 頁裡找得到（不能憑空出現）
 //   3. 術語：名詞第一次出現的那張投影片要有解釋（<dfn>名詞</dfn>，或名詞後面緊接「（」說明）
+//   5. 字數：一張投影片看得到的字不超過 MAX_CHARS（名詞小抄、來源列不算）
 //   4. 版面：用無頭 Edge 以 1280×720 畫每一張，內容不能超出投影片、不能壓到底下的來源列
 // 有錯就 exit code 1。
 import { readFileSync, existsSync, writeFileSync, mkdirSync, mkdtempSync } from 'node:fs';
@@ -19,6 +20,7 @@ const html = readFileSync(HTML, 'utf8');
 const wiki = (p) => readFileSync(join(ROOT, 'wiki', p + '.md'), 'utf8');
 const TERMS = JSON.parse(readFileSync(join(ROOT, 'tools', 'terms.json'), 'utf8')).terms;   // 跟 outline_check 共用
 
+const MAX_CHARS = 150;   // 一張投影片最多幾個字（2026-11-23 使用者：「廢話有點多」）
 const errs = [];
 const slides = [...html.matchAll(/<section class="slide[^"]*" data-wiki="([^"]+)">([\s\S]*?)<\/section>/g)]
   .map((m, i) => ({ n: i + 1, pages: m[1].split(','), html: m[2], text: m[2].replace(/<\/?(td|th|tr|li|p|div|h\d|br|ul|ol|table)\b[^>]*>/g, ' ').replace(/<[^>]+>/g, '').replace(/&[a-z]+;/g, ' ') }));
@@ -54,6 +56,13 @@ if (oi > 0) {
     if (want !== got) err(s, `Wiki 頁跟大綱不一樣：大綱「${want}」，簡報「${got}」`);
   }
   if (rows.length !== slides.length) errs.push(`大綱 ${rows.length} 張，簡報 ${slides.length} 張`);
+}
+
+// 3a. 大綱說不用的術語，簡報裡不能出現
+if (oi > 0) {
+  const om = readFileSync(join(ROOT, process.argv[oi + 1]), 'utf8');
+  const unused = ((om.match(/^不用的術語：(.*)$/m) || [, ''])[1]).split('、').map((x) => x.trim()).filter(Boolean);
+  for (const t of unused) { const s = slides.find((x) => x.text.includes(t)); if (s) err(s, `術語「${t}」大綱說不用，簡報卻出現了`); }
 }
 
 // 3. 術語
@@ -95,6 +104,12 @@ for (let i = 0; i < total; i++) {
       const what = (el.textContent || el.alt || '').trim().slice(0, 18);
       if (r.right > box.right - 1 || r.bottom > box.bottom - 1) out.push('超出投影片：' + tag + '「' + what + '」');
       else if (r.bottom > foot.top + 1 && r.height < 600 * k && !s.classList.contains('cover')) out.push('壓到來源列（超出 ' + Math.round((r.bottom - foot.top) / k) + 'px）：' + tag + '「' + what + '」');
+    }
+    // 字數：投影片上看得到的字（不算名詞小抄、來源列、資料來源那張），超過上限就是講太多
+    if (!s.dataset.wiki.includes('index')) {
+      const c = s.cloneNode(true); c.querySelectorAll('.terms,.src,[hidden]').forEach((x) => x.remove());
+      const n = c.textContent.replace(/\\s/g, '').length;
+      if (n > ${MAX_CHARS}) out.push('字太多：' + n + ' 字（上限 ${MAX_CHARS}）');
     }
     let low = 0;
     for (const el of s.querySelectorAll('*')) if (!el.closest('.src') && el.getClientRects().length && !el.hidden) low = Math.max(low, el.getBoundingClientRect().bottom);

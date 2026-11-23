@@ -2,7 +2,7 @@
 //   node tools/outline_check.mjs 紀錄/08-簡報大綱-v2.md
 // 檢查項目：
 //   1. 每張投影片「用的 Wiki 頁」都存在
-//   2. tools/terms.json 的每個術語，都在某一張的「第一次出現的術語」欄被安排到，而且只安排一次
+//   2. tools/terms.json 的每個術語，要嘛在某一張的「第一次出現的術語」欄被安排到（只安排一次），要嘛寫在「不用的術語：」那行
 //   3. 安排到的術語，名詞表裡都有解釋
 //   4. 有安排術語的投影片，Wiki 頁要包含「名詞表」（簡報上的解釋才找得到出處）
 import { readFileSync, existsSync } from 'node:fs';
@@ -32,7 +32,9 @@ for (const [n, title, , pages, newTerms = ''] of rows) {
     if (!row) errs.push(`第 ${n} 張  術語「${t}」在名詞表裡沒有解釋（先回 Wiki 補）`);
   }
 }
-for (const t of terms) if (!seen.has(t)) errs.push(`術語「${t}」沒有安排在任何一張`);
+const unused = split((md.match(/^不用的術語：(.*)$/m) || [, ''])[1]);   // 大綱決定不講的術語
+for (const t of unused) if (seen.has(t)) errs.push(`術語「${t}」寫在「不用的術語」，卻又安排在第 ${seen.get(t)} 張`);
+for (const t of terms) if (!seen.has(t) && !unused.includes(t)) errs.push(`術語「${t}」沒有安排在任何一張，也沒寫在「不用的術語」`);
 
 console.log(`大綱 ${rows.length} 張、術語 ${terms.length} 個`);
 if (errs.length) { console.log(errs.join('\n')); console.log(`\n✗ ${errs.length} 個問題`); process.exitCode = 1; }

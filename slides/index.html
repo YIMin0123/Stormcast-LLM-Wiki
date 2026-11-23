@@ -72,6 +72,19 @@ th{color:var(--mute);font-size:17px;font-weight:700}
 .terms dfn{display:block;font-size:18px}
 .hint{display:none;position:fixed;top:14px;left:0;right:0;text-align:center;font-size:15px;color:var(--mute)}
 @media (orientation:portrait) and (max-width:700px){.hint{display:block}}
+.big-card{font-size:26px;font-weight:700;line-height:1.5;padding:26px 28px}
+.pic{margin:0;display:flex;flex-direction:column;min-height:0;flex:1;background:var(--bg);border-radius:12px;overflow:hidden}
+.pic img{width:100%;flex:1;min-height:0;object-fit:contain;display:block;background:#fff}
+.pic figcaption{font-size:17px;padding:7px 12px;color:var(--mute)}
+.case p{font-size:22px}
+.case h3{font-size:28px}
+.learn{margin-top:14px;font-weight:700;color:var(--leaf)}
+#quiz li{font-size:22px}
+.mid .lead{font-size:30px}
+.mid .card p,.mid .card li{font-size:25px}
+.mid .card h3{font-size:30px}
+.mid .flow .step{font-size:21px}
+.mid .flow .step b{font-size:24px}
 .answer{display:none;color:var(--leaf);font-weight:700}
 .reveal .answer{display:inline}
 </style>
@@ -82,285 +95,192 @@ th{color:var(--mute);font-size:17px;font-weight:700}
 
 <!-- 1 封面 -->
 <section class="slide cover" data-wiki="多AI協作總覽">
-  <div class="kicker">生成式 AI 教學簡報 ・ 第十週</div>
+  <div class="kicker">生成式 AI 教學簡報</div>
   <h1>AI 團隊怎麼<br>一起寫出一款遊戲？</h1>
-  <p class="lead" style="margin-top:22px;max-width:640px">以 3D 線上釣魚遊戲 Stormcast 為例：<br>好幾個 AI 輪流開發時，怎麼交接、怎麼互相檢查、出錯了怎麼辦</p>
-  <p style="margin-top:34px;font-size:20px;color:#d6e6ee">朝陽科大 資通系 吳翊銘 ・ 內容全部來自自己建的 LLM Wiki</p>
+  <p class="lead" style="margin-top:22px;max-width:600px">以 3D 線上釣魚遊戲 Stormcast 為例</p>
+  <p style="margin-top:34px;font-size:20px;color:#d6e6ee">朝陽科大 資通系 吳翊銘</p>
 </section>
 
 <!-- 2 問題 -->
 <section class="slide mid" data-wiki="多AI協作總覽">
   <div class="kicker">先想一個問題</div>
-  <h2>六個人輪流寫同一份報告，<br>但每個人都<span style="color:var(--red)">看不到</span>前一個人說過的話……</h2>
+  <h2>六個人輪流寫同一份報告，<br>每個人都<span style="color:var(--red)">看不到</span>前一個人說過的話……</h2>
   <div class="grid3" style="margin-top:10px">
-    <div class="card"><span class="tag t-red">會發生</span><p>A 寫到一半，B 不知道，從頭重寫一次</p></div>
-    <div class="card"><span class="tag t-red">會發生</span><p>A 踩過的坑，B 又踩一次</p></div>
-    <div class="card"><span class="tag t-red">會發生</span><p>A 和 B 同時改同一段，互相蓋掉</p></div>
+    <div class="card big-card">😵 重寫別人寫好的</div>
+    <div class="card big-card">🕳️ 踩別人踩過的坑</div>
+    <div class="card big-card">💥 互相蓋掉對方的修改</div>
   </div>
-  <p class="lead" style="margin-top:34px">這不是假設：好幾個 AI 一起寫程式時，遇到的就是這個問題。</p>
+  <p class="lead" style="margin-top:34px">好幾個 AI 一起寫程式，遇到的就是這個問題。</p>
 </section>
 
 <!-- 3 Stormcast -->
 <section class="slide" data-wiki="多AI協作總覽,名詞表">
   <div class="kicker">今天的例子</div>
-  <h2>Stormcast：幾乎全由 AI 寫出來的線上遊戲</h2>
-  <div class="grid2" style="grid-template-columns:1.15fr 1fr;flex:1;min-height:0">
-    <img class="shot" src="img/遊戲_多人碼頭.jpg" alt="Stormcast 遊戲畫面：多位玩家在碼頭">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-content:start">
-      <div class="stat"><div class="big">819</div><small>次提交（存檔點）</small></div>
-      <div class="stat"><div class="big">247</div><small>篇 AI 交接日誌</small></div>
-      <div class="stat"><div class="big">12</div><small>份<dfn>審查</dfn>報告（請別的 AI 挑錯）</small></div>
-      <div class="stat"><div class="big">80</div><small>個自動測試檔</small></div>
-      <div class="stat" style="grid-column:1/-1"><p style="font-size:20px">開發期間 2026-11-12 到 2026-11-23。<br>寫過日誌的 AI：Claude Opus、Sonnet、Fable、Codex、Gemini、Antigravity</p></div>
+  <h2>Stormcast：好幾個 AI 一起寫的線上釣魚遊戲</h2>
+  <div style="display:grid;grid-template-columns:1.25fr 1fr;gap:18px;flex:1;min-height:0">
+    <img class="shot" src="img/遊戲_多人碼頭.jpg" alt="遊戲畫面：玩家在碼頭">
+    <div style="display:flex;flex-direction:column;gap:14px;min-height:0">
+      <img src="img/角色模型並排.jpg" alt="遊戲裡的角色模型" style="width:100%;border-radius:12px;display:block">
+      <div class="stat"><div class="big">819</div><small>次提交（存檔點，存一次記一次）</small></div>
+      <div class="stat"><div class="big">247</div><small>篇 AI 寫給 AI 的交接日誌</small></div>
     </div>
   </div>
 </section>
 
 <!-- 4 AI Agent -->
-<section class="slide" data-wiki="名詞表,多AI協作總覽">
+<section class="slide mid" data-wiki="名詞表,多AI協作總覽">
   <div class="kicker">基本概念</div>
   <h2>什麼是 AI Agent？</h2>
   <div class="grid2">
-    <div class="card">
-      <span class="tag t-sea">聊天機器人</span>
-      <h3>你問、它答</h3>
-      <ul><li>只會產生文字</li><li>程式碼要你自己複製、貼上、執行</li><li>錯了要你告訴它</li></ul>
-    </div>
-    <div class="card" style="outline:3px solid var(--sea)">
-      <span class="tag t-leaf">AI Agent（AI 代理）</span>
-      <h3>你交代、它動手</h3>
-      <ul><li>自己讀檔案、改程式</li><li>自己跑指令、看結果</li><li>看到錯誤再決定下一步</li></ul>
-    </div>
+    <div class="card"><span class="tag t-sea">聊天機器人</span><h3>你問、它答</h3><p>只會產生文字</p></div>
+    <div class="card" style="outline:3px solid var(--sea)"><span class="tag t-leaf">AI Agent（AI 代理）</span><h3>你交代、它動手</h3><p>自己讀檔、改程式、跑起來看結果</p></div>
   </div>
-  <p class="lead" style="margin-top:28px">Claude Code、Codex 都是這一類。Stormcast 就是好幾個 AI Agent 輪流改同一個資料夾寫出來的。</p>
+  <p class="lead" style="margin-top:28px">Stormcast 就是好幾個 AI Agent 輪流改同一個資料夾寫出來的。</p>
 </section>
 
-<!-- 5 難題 -->
-<section class="slide mid" data-wiki="多AI協作總覽,共用記憶">
+<!-- 5 共用記憶 -->
+<section class="slide mid" data-wiki="共用記憶">
   <div class="kicker">最大的難題</div>
-  <h2>每個 AI 都會「失憶」</h2>
-  <div class="grid2" style="align-items:start">
-    <div>
-      <ul>
-        <li>每開一段新對話，AI 就不記得上次做過什麼</li>
-        <li>不同的 AI <b>看不到彼此的對話</b></li>
-        <li>它們唯一共用的，是同一個<b>專案資料夾</b></li>
-      </ul>
-    </div>
-    <div class="quote">「所有 AI 共用同一個資料夾，卻看不到彼此的對話。」<br><span style="font-size:18px;color:var(--mute)">— 專案的日誌說明</span></div>
-  </div>
-  <p class="lead" style="margin-top:40px">所以答案是：<b style="color:var(--ink)">把要記住的事寫成檔案，放進資料夾</b>。<br>每個 AI 開工前都先讀這些檔案，這叫做 <dfn>共用記憶</dfn>。</p>
-</section>
-
-<!-- 6 三層 -->
-<section class="slide" data-wiki="共用記憶,名詞表">
-  <div class="kicker">解法</div>
-  <h2>三層共用記憶，各管各的</h2>
+  <h2>AI 會失憶，所以把記憶寫成檔案</h2>
+  <p class="lead" style="margin-bottom:22px">AI 看不到彼此的對話，只共用同一個資料夾。開工前都先讀這三種檔：</p>
   <div class="grid3">
-    <div class="card"><span class="tag t-sea">規則</span><h3>CLAUDE.md</h3><p>這裡能做什麼、不能做什麼？</p><p style="color:var(--mute);margin-top:8px">像員工守則・很少變</p></div>
-    <div class="card"><span class="tag t-sun">現況</span><h3>工程架構手冊</h3><p>現在的程式長怎樣？哪個檔管什麼？</p><p style="color:var(--mute);margin-top:8px">像一張隨時更新的地圖</p></div>
-    <div class="card"><span class="tag t-leaf">交接</span><h3>交接日誌</h3><p>最近誰做了什麼、做到哪？</p><p style="color:var(--mute);margin-top:8px">像交班筆記・一個任務一篇</p></div>
-  </div>
-  <p class="lead" style="margin-top:30px">三層<b style="color:var(--ink)">不重複</b>：日誌只寫「變化和原因」，現況寫在手冊；手冊只寫「現在」，歷史交給 <code>git log</code>（列出歷次提交的指令）。</p>
-</section>
-
-<!-- 7 CLAUDE.md -->
-<section class="slide" data-wiki="CLAUDE-md,名詞表">
-  <div class="kicker">第一層・規則</div>
-  <h2>CLAUDE.md：所有 AI 都要遵守的規則</h2>
-  <table>
-    <tr><th style="width:22%">類別</th><th>規則</th></tr>
-    <tr><td>範圍</td><td>大改動前先跟使用者確認，只做講好的範圍</td></tr>
-    <tr><td>多人同時改</td><td>改前先讀現行檔案；提交時清單只能有自己的檔</td></tr>
-    <tr><td>測試</td><td>另開 <code>?test</code> 分頁，不動使用者正在玩的那頁</td></tr>
-    <tr><td><dfn>上線</dfn></td><td>把新版放到正式網站給玩家玩：<b>使用者說了才上線，也不要主動問</b></td></tr>
-    <tr><td>安全</td><td>不准提交密鑰、<code>.env</code>、玩家資料</td></tr>
-    <tr><td>交接</td><td>靠 <code>docs/日誌/</code>，開工前先讀最後幾篇</td></tr>
-  </table>
-</section>
-
-<!-- 8 手冊 -->
-<section class="slide mid" data-wiki="工程架構手冊">
-  <div class="kicker">第二層・現況</div>
-  <h2>工程架構手冊：踩過的坑，變成鐵律</h2>
-  <div class="grid2">
-    <div>
-      <p>手冊第一句話：</p>
-      <div class="quote" style="margin:10px 0 22px">「這是一份『活的現況地圖』。」</div>
-      <p>五章：世界現況、開發速查、模組地圖、<b>鐵律與踩坑紀錄</b>、文件維護協定。</p>
-    </div>
-    <div class="card">
-      <span class="tag t-red">鐵律的例子</span>
-      <h3>海床圖要分兩張</h3>
-      <p><code>bed</code> 含海上礁石（給船擱淺用），<code>main</code> 只含兩座大島。混在一起的話，外海風暴消失、鮪魚釣不到。</p>
-      <p style="margin-top:12px;color:var(--mute)">踩到大坑並修好 → 濃縮成 2～3 行規則寫進手冊，下一個 AI 就不會再踩。</p>
-    </div>
+    <div class="card"><span class="tag t-sea">規則</span><h3>CLAUDE.md</h3><p>能做什麼、不能做什麼</p></div>
+    <div class="card"><span class="tag t-sun">現況</span><h3>工程架構手冊</h3><p>程式現在長怎樣</p></div>
+    <div class="card"><span class="tag t-leaf">交接</span><h3>交接日誌</h3><p>誰做了什麼、做到哪</p></div>
   </div>
 </section>
 
-<!-- 9 日誌 -->
-<section class="slide" data-wiki="交接日誌">
-  <div class="kicker">第三層・交接</div>
-  <h2>一篇交接日誌的一生</h2>
+<!-- 6 規則 -->
+<section class="slide mid" data-wiki="CLAUDE-md,名詞表">
+  <div class="kicker">規則</div>
+  <h2>所有 AI 都要守的四條規則</h2>
+  <div class="grid2" style="gap:18px">
+    <div class="card big-card">① 大改動前先問人</div>
+    <div class="card big-card">② 只提交自己改的檔</div>
+    <div class="card big-card">③ 測試另開分頁，不動玩家的畫面</div>
+    <div class="card big-card">④ <dfn>上線</dfn>（把新版放到正式網站）要人說了才做</div>
+  </div>
+</section>
+
+<!-- 7 日誌 -->
+<section class="slide mid" data-wiki="交接日誌">
+  <div class="kicker">交接</div>
+  <h2>交接日誌：AI 之間的交班筆記</h2>
   <div class="flow">
-    <div class="step"><span class="tag t-sun">開工</span><b>建檔：「進行中」</b>寫下會動到哪些檔案，別的 AI 馬上看得到、會避開</div>
+    <div class="step"><span class="tag t-sun">進行中</span><b>「我在改這幾個檔」</b>別的 AI 看到就避開</div>
     <div class="arr">→</div>
-    <div class="step"><span class="tag t-sea">提交</span><b>改成「已提交」</b>補寫改了什麼、為什麼、踩到的坑、沒解決的事</div>
+    <div class="step"><span class="tag t-sea">已提交</span><b>改了什麼、為什麼</b>還有哪裡沒測</div>
     <div class="arr">→</div>
-    <div class="step"><span class="tag t-leaf">上線</span><b>改成「已上線」</b>寫上日期</div>
+    <div class="step"><span class="tag t-leaf">已上線</span><b>寫上日期</b></div>
   </div>
-  <div class="grid2" style="margin-top:28px">
-    <div class="card"><h3>最重要的一欄：要知道的事</h3><p>坑、刻意的設計，還有<b>驗證了什麼、沒驗證什麼</b>。下一個 AI 才知道哪裡還沒測。</p></div>
-    <div class="card"><h3>防卡死</h3><p>「進行中」超過一天視為過期，可以忽略，避免當掉的 AI 一直佔著檔案。</p></div>
-  </div>
+  <p class="lead" style="margin-top:30px">一個任務一篇。下一個 AI 開工前讀最近幾篇，就知道別人在做什麼。</p>
 </section>
 
-<!-- 10 迴圈 -->
-<section class="slide" data-wiki="開發迴圈">
-  <div class="kicker">把它們串起來</div>
-  <h2>開發迴圈：一個需求從提出到上線</h2>
-  <div class="flow" style="margin-bottom:16px">
-    <div class="step"><b>① 讀共用記憶</b>規則、手冊、最近的日誌</div><div class="arr">→</div>
-    <div class="step"><b>② 確認範圍</b>大改動先問人</div><div class="arr">→</div>
-    <div class="step"><b>③ 開日誌</b>標「進行中」</div><div class="arr">→</div>
+<!-- 8 迴圈 -->
+<section class="slide mid" data-wiki="開發迴圈,名詞表">
+  <div class="kicker">流程</div>
+  <h2>開發迴圈：一個需求怎麼走完</h2>
+  <div class="flow" style="margin-bottom:14px">
+    <div class="step"><b>① 讀檔</b></div><div class="arr">→</div>
+    <div class="step"><b>② 問清楚</b></div><div class="arr">→</div>
+    <div class="step"><b>③ 寫日誌</b></div><div class="arr">→</div>
     <div class="step" style="outline:3px solid var(--sun)"><b>④ 改程式</b></div><div class="arr">⇄</div>
-    <div class="step" style="outline:3px solid var(--sun)"><b>⑤ 測試</b>自動測試＋實際打開看</div>
+    <div class="step" style="outline:3px solid var(--sun)"><b>⑤ 測試</b></div>
   </div>
   <div class="flow">
-    <div class="step"><b>⑥ 提交</b>日誌跟程式同一次存檔；改到結構就更新手冊</div><div class="arr">→</div>
-    <div class="step"><b>⑦ 審查</b>（人說才做）別的 AI 挑錯 → 回 ④</div><div class="arr">→</div>
-    <div class="step"><b>⑧ 上線</b>（人說才做）上線前後各檢查一次</div>
+    <div class="step"><b>⑥ 提交</b></div><div class="arr">→</div>
+    <div class="step"><b>⑦ 審查</b>（別的 AI 挑錯）</div><div class="arr">→</div>
+    <div class="step"><b>⑧ 上線</b></div>
   </div>
   <div class="grid2" style="margin-top:22px">
-    <div class="card"><span class="tag t-sun">哪裡會重複</span><p><b>④⑤</b> 最內圈：改 → 測 → 不對再改<br><b>⑦→④</b> 審查挑出的回去改<br><b>整圈</b>：下一個 AI 讀上一個 AI 的日誌再開始</p></div>
-    <div class="card"><span class="tag t-sea">哪裡要人決定</span><p><b>②</b> 大改動的範圍<br><b>⑦</b> 要不要審查、修哪幾條<br><b>⑧</b> 要不要上線</p></div>
+    <div class="card"><span class="tag t-sun">會重複</span><p>④⑤ 改到對為止；⑦ 挑出的錯回到 ④</p></div>
+    <div class="card"><span class="tag t-sea">人決定</span><p>② 做多大、⑦ 修哪些、⑧ 要不要上線</p></div>
   </div>
 </section>
 
-<!-- 11 審查 -->
-<section class="slide" data-wiki="審查流程">
-  <div class="kicker">節點 ⑦</div>
+<!-- 9 審查① -->
+<section class="slide mid" data-wiki="審查流程">
+  <div class="kicker">檢查①</div>
   <h2>審查：讓別的 AI 來挑錯</h2>
-  <div class="flow" style="margin-bottom:24px">
-    <div class="step"><b>主 AI 寫說明</b>審什麼、使用者原話、規則</div><div class="arr">→</div>
-    <div class="step"><b>codex、agy 各自審</b>互相看不到、只看不改</div><div class="arr">→</div>
-    <div class="step"><b>主 AI 回程式驗證</b>成立／待確認／不成立</div><div class="arr">→</div>
-    <div class="step"><b>使用者挑</b>要修哪幾條才動手</div>
+  <div class="flow" style="margin-bottom:26px">
+    <div class="step"><b>主 AI 寫說明</b></div><div class="arr">→</div>
+    <div class="step"><b>codex、agy 各自看</b>互相看不到</div><div class="arr">→</div>
+    <div class="step"><b>主 AI 回程式確認</b></div><div class="arr">→</div>
+    <div class="step"><b>使用者挑要修哪些</b></div>
   </div>
-  <div class="card">
-    <span class="tag t-sun">實際跑一次：風景升級（2026-11-21）</span>
-    <p>報告共 <b>26</b> 條。第 1 條「開相機後滑鼠被鎖住，按鈕全部點不到」兩方都抓到，作者 AI 承認：</p>
-    <div class="quote" style="margin-top:10px">「我自己測的時候只用了鍵盤和第三人稱，所以漏掉了。」</div>
-  </div>
+  <div class="quote">風景升級那次挑出 26 條，第 1 條作者自己就沒測到。<br><b>自己檢查自己，會有盲點。</b></div>
 </section>
 
-<!-- 12 上線 -->
-<section class="slide" data-wiki="上線流程,名詞表">
-  <div class="kicker">節點 ⑧</div>
-  <h2>上線：最後一關由人決定</h2>
-  <div class="grid2">
-    <div class="card"><span class="tag t-sea">上線前（AI 做）</span><ul><li>跑全部自動測試，<b>有失敗就停</b></li><li>列出這次要上線的改動給人看</li><li>看線上有多少玩家</li></ul></div>
-    <div class="card"><span class="tag t-leaf">上線後（AI 做）</span><ul><li>看<dfn>伺服器</dfn>（讓所有玩家連進同一個世界的電腦）有沒有錯誤</li><li>在正式網站實際看一次</li><li>日誌改成「已上線」</li></ul></div>
-  </div>
-  <p class="lead" style="margin-top:26px">有玩家在線上時：<dfn>跑馬燈</dfn>（畫面上方捲動的公告）倒數 60 秒，歸零才重開，玩家只中斷一次。<br><b style="color:var(--ink)">按下上線的永遠是人</b>，因為它會影響真的在玩的玩家。</p>
-</section>
-
-<!-- 13 案例1 -->
-<section class="slide" data-wiki="案例-白畫面,名詞表">
-  <div class="kicker" style="color:var(--red)">出錯案例 1・2026-11-16</div>
-  <h2>改了程式，整個遊戲進不去</h2>
-  <div class="grid2">
-    <div>
-      <h3>發生什麼事</h3>
-      <p>進遊戲只剩深藍底，什麼都看不到。<dfn>主控台</dfn>（瀏覽器裡顯示錯誤訊息的地方）寫著：</p>
-      <p style="margin:8px 0 18px"><code style="font-size:18px">Cannot access 'dexBook' before initialization</code></p>
-      <h3>原因</h3>
-      <p>Antigravity 的改動讓價格牌去讀 <code>dexBook</code>，但遊戲一載入就先畫價格牌，那時它還沒建好。<br>白話：<b>還沒開抽屜就要拿東西</b>。</p>
-    </div>
-    <div class="card">
-      <span class="tag t-leaf">怎麼修、學到什麼</span>
-      <ul><li>Claude Sonnet 把宣告搬到前面</li><li>驗證：重新打開，進得去、沒錯誤</li><li>日誌誠實寫「沒有實測買頭銜、改裝」</li><li><b>檢查往前移</b>：改完就要真的打開遊戲看，不能只看程式碼</li></ul>
+<!-- 10 審查② 檢視頁 -->
+<section class="slide" data-wiki="檢視頁">
+  <div class="kicker">檢查②</div>
+  <h2>做一頁網頁，用眼睛看</h2>
+  <div style="display:grid;grid-template-columns:1.45fr 1fr;gap:16px;flex:1;min-height:0">
+    <figure class="pic"><img style="background:linear-gradient(rgb(80, 165, 202) 50%,rgb(80, 165, 202) 50%)" src="img/檢視頁_船漆.jpg" alt="船的檢視頁：換船漆"><figcaption>船：換船漆、換角度 <code>/boats.html</code></figcaption></figure>
+    <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+      <figure class="pic"><img style="background:linear-gradient(rgb(223, 241, 251) 50%,rgb(235, 240, 234) 50%)" src="img/檢視頁_角色模型.jpg" alt="角色模型檢視頁"><figcaption>角色：換表情、姿勢 <code>/models.html</code></figcaption></figure>
+      <figure class="pic"><img style="background:linear-gradient(rgb(236, 241, 235) 50%,rgb(236, 241, 235) 50%)" src="img/檢視頁_手上的東西.jpg" alt="道具檢視頁"><figcaption>道具 <code>/props.html</code></figcaption></figure>
     </div>
   </div>
+  <p style="font-size:22px;margin-top:12px">顏色塗歪、比例怪，讀程式看不出來；排在一起，一眼就看到。</p>
 </section>
 
-<!-- 14 案例2 -->
-<section class="slide" data-wiki="案例-人物變白,名詞表">
-  <div class="kicker" style="color:var(--red)">出錯案例 2・2026-11-17</div>
-  <h2>本機正常，正式網站的人物全變白</h2>
-  <div class="flow" style="margin-bottom:22px">
-    <div class="step"><span class="tag t-sea">Codex</span><b>加強安全</b>加了一條 CSP 規則，限制網頁能從哪裡讀資料</div><div class="arr">→</div>
-    <div class="step"><span class="tag t-red">副作用</span><b>貼圖被擋</b>人物貼圖用 <code>blob:</code> 網址讀，沒被放行</div><div class="arr">→</div>
-    <div class="step"><span class="tag t-red">更糟</span><b>沒有任何錯誤訊息</b>Three.js 讀不到貼圖不會報錯</div><div class="arr">→</div>
-    <div class="step"><span class="tag t-leaf">Sonnet 修好</span><b>放行 <code>blob: data:</code></b>並在手冊寫下為什麼不能拿掉</div>
-  </div>
-  <div class="quote">每個 AI 各自做對的事，合在一起可能出錯。<br><span style="font-size:20px">→ 改安全規則要先在正式網址實測；上線後要在正式網站實際看一次。</span></div>
-  <div class="terms" style="--n:4">
-    <div><dfn>CSP</dfn>網站的安全規則，規定網頁只能從哪些地方讀資料</div>
-    <div><dfn>貼圖</dfn>貼在 3D 模型表面的圖片；讀不到，模型就變一片白</div>
-    <div><dfn>Three.js</dfn>在網頁上畫 3D 畫面的程式庫</div>
-    <div><dfn>blob:</dfn>瀏覽器自己在記憶體裡產生的資料網址</div>
-  </div>
-</section>
-
-<!-- 15 案例3 -->
-<section class="slide" data-wiki="案例-暴風雨誤判,名詞表">
-  <div class="kicker" style="color:var(--red)">出錯案例 3・2026-11-14</div>
-  <h2>AI 先猜錯原因，改回來，再找到真正的錯</h2>
-  <table style="margin-bottom:14px;font-size:20px">
-    <tr><th style="width:12%">時間</th><th style="width:14%">提交</th><th>做了什麼</th></tr>
-    <tr><td>21:16</td><td><code>432fe16</code></td><td><b>第一次判斷</b>：以為浪太高、鏡頭跑進水裡</td></tr>
-    <tr><td>21:20</td><td><code>5b8aaca</code></td><td><b>真正原因</b>：飛沫的著色器算出 NaN，被光暈擴散成整個畫面</td></tr>
-    <tr><td>21:21</td><td><code>9804271</code></td><td><b>改回</b>第一次的修法：「那次判斷錯了」</td></tr>
-  </table>
+<!-- 11 上線 -->
+<section class="slide mid" data-wiki="上線流程">
+  <div class="kicker">最後一關</div>
+  <h2>上線：AI 檢查，人按按鈕</h2>
   <div class="grid2">
-    <div class="card" style="padding:16px 22px"><h3>AI 會自信地猜錯</h3><p>看到症狀很快提出「聽起來合理」的原因，但修的是症狀不是原因。</p></div>
-    <div class="card" style="padding:16px 22px"><h3>修兩層</h3><p>改掉算錯的地方，<b>再加一道防線</b>：光暈先丟掉 NaN，同類錯不會再擴散。</p></div>
+    <div class="card"><span class="tag t-sea">上線前</span><ul><li>跑全部測試，<b>有錯就停</b></li><li>列出改了什麼給人看</li></ul></div>
+    <div class="card"><span class="tag t-leaf">上線後</span><ul><li>在正式網站實際看一次</li><li>日誌改成「已上線」</li></ul></div>
   </div>
-  <div class="terms">
-    <div><dfn>著色器</dfn>在顯示卡上算每個像素顏色的小程式</div>
-    <div><dfn>NaN</dfn>「不是數字」：算錯時得到的結果，會一路傳染</div>
-    <div><dfn>光暈</dfn>讓亮的地方往外暈開的效果；壞掉的像素也會被擴散</div>
+  <p class="lead" style="margin-top:28px">按下上線的永遠是人：它會影響正在玩的玩家。</p>
+</section>
+
+<!-- 12 三個錯 -->
+<section class="slide mid" data-wiki="案例-白畫面,案例-人物變白,案例-暴風雨誤判">
+  <h2>AI 出過的三個錯</h2>
+  <div class="grid3">
+    <div class="card case"><span class="tag t-red">2026-11-16</span><h3>遊戲打不開</h3><p>改了一段程式，一進遊戲只剩深藍底。</p><p class="learn">→ 改完要真的打開來玩</p></div>
+    <div class="card case"><span class="tag t-red">2026-11-17</span><h3>人物全變白</h3><p>加了安全規則，正式網站壞掉，自己電腦卻正常。</p><p class="learn">→ 上線後去正式網站看</p></div>
+    <div class="card case"><span class="tag t-red">2026-11-14</span><h3>修錯了</h3><p>畫面變深藍，AI 先猜錯原因，修錯又改回來。</p><p class="learn">→ 找到真正原因再修</p></div>
   </div>
 </section>
 
-<!-- 16 往前移 -->
-<section class="slide" data-wiki="開發迴圈,docLint,名詞表">
+<!-- 13 往前移 -->
+<section class="slide mid" data-wiki="開發迴圈,docLint,名詞表">
   <div class="kicker">最重要的一課</div>
   <h2>每出一次錯，就把檢查往前移</h2>
   <table>
-    <tr><th>案例</th><th>原本在哪發現</th><th>之後檢查放在哪</th></tr>
-    <tr><td>白畫面</td><td>使用者自己打開才發現</td><td>⑤ 改完就開測試分頁進遊戲看</td></tr>
-    <tr><td>人物變白</td><td>上線後玩家看到</td><td>⑧ 正式網址實測、上線後實際看</td></tr>
-    <tr><td>暴風雨誤判</td><td>修完才發現修錯</td><td>下游加防線，同類錯不擴散</td></tr>
-    <tr><td>手冊過時</td><td>下一個 AI 被錯的手冊誤導</td><td>⑥ 提交前跑 <code>docLint</code> 檢查手冊</td></tr>
+    <tr><th>錯</th><th>以前誰發現</th><th>現在在哪一步就查</th></tr>
+    <tr><td>遊戲打不開</td><td>使用者</td><td>⑤ 改完就打開來玩</td></tr>
+    <tr><td>正式網站壞掉</td><td>玩家</td><td>⑧ 上線後馬上看</td></tr>
+    <tr><td>手冊跟程式對不上</td><td>下一個 AI</td><td>⑥ 提交前跑 docLint</td></tr>
   </table>
-  <p class="lead" style="margin-top:22px;font-size:24px"><dfn>docLint</dfn>：把手冊裡寫的檔名、函式名一個個到程式裡找，找不到就是手冊過時了。第一次跑就抓到 <code>marqCrown</code> 早已改名 <code>marqPush</code>。</p>
+  <p class="lead" style="margin-top:24px"><dfn>docLint</dfn>：自動拿手冊寫的名字去程式裡找，找不到就是手冊過時了。</p>
 </section>
 
-<!-- 17 小結 -->
-<section class="slide" data-wiki="開發迴圈,共用記憶">
+<!-- 14 小結 -->
+<section class="slide mid" data-wiki="開發迴圈,共用記憶">
   <div class="kicker">小結</div>
-  <h2>三個重點</h2>
-  <div class="grid3" style="margin-bottom:26px">
-    <div class="card"><span class="tag t-sea">1</span><h3>寫下來</h3><p>AI 會失憶，要記住的事寫成檔案：規則、現況、交接三層。</p></div>
-    <div class="card"><span class="tag t-sun">2</span><h3>跑成迴圈</h3><p>讀 → 改 → 測 → 提交 → 審查 → 上線，下一個 AI 接著跑。</p></div>
-    <div class="card"><span class="tag t-leaf">3</span><h3>檢查往前移</h3><p>每出一次錯，就把檢查放到離錯最近的節點。</p></div>
+  <div class="grid3" style="margin-bottom:28px">
+    <div class="card"><span class="tag t-sea">1</span><h3>寫下來</h3><p>AI 會失憶，記憶寫成檔案</p></div>
+    <div class="card"><span class="tag t-sun">2</span><h3>跑成迴圈</h3><p>讀、改、測、交、審、上線</p></div>
+    <div class="card"><span class="tag t-leaf">3</span><h3>檢查往前移</h3><p>錯在哪一步，就在那一步查</p></div>
   </div>
   <h3>自我檢查（點一下看答案）</h3>
   <ol style="padding-left:1.3em" id="quiz">
-    <li style="font-size:21px">AI 之間看不到對話，靠什麼交接？ <span class="answer">交接日誌（docs/日誌/）</span></li>
-    <li style="font-size:21px">為什麼「上線」一定要人說了才做？ <span class="answer">會影響真的在玩的玩家</span></li>
-    <li style="font-size:21px">人物變白的錯，為什麼本機看不出來？ <span class="answer">那條安全規則只在正式網站有</span></li>
+    <li>AI 之間靠什麼交接？ <span class="answer">交接日誌</span></li>
+    <li>上線為什麼要人決定？ <span class="answer">會影響正在玩的玩家</span></li>
+    <li>船漆塗歪，怎麼查最快？ <span class="answer">檢視頁，用眼睛看</span></li>
   </ol>
 </section>
 
-<!-- 18 來源 -->
+<!-- 15 來源 -->
 <section class="slide" data-wiki="index">
   <div class="kicker">資料來源</div>
   <h2>這份簡報用到的 Wiki 頁</h2>
-  <p style="font-size:20px;color:var(--mute);margin-bottom:14px">每張投影片右下角都標了它用的 Wiki 頁。Wiki 由 12 份 Stormcast 專案的真實資料整理而成。</p>
-  <div id="map" style="columns:2;column-gap:40px;font-size:19px;line-height:1.7"></div>
+  <p style="font-size:20px;color:var(--mute);margin-bottom:14px">每張右下角都標了它用的 Wiki 頁。Wiki 由 14 份 Stormcast 專案的真實資料整理而成。</p>
+  <div id="map" style="columns:2;column-gap:40px;font-size:20px;line-height:1.8"></div>
 </section>
 
 </div>
@@ -377,7 +297,7 @@ slides.forEach((s, i) => {
   s.appendChild(f);
 });
 document.getElementById('map').innerHTML = slides.slice(0, -1).map((s, i) =>
-  `<div>${i + 1}. ${s.querySelector('h1,h2').textContent.replace(/\s+/g, ' ').trim()} → ${s.dataset.wiki.replace(/,/g, '、')}</div>`).join('');
+  `<div>${i + 1}. ${(s.querySelector('h1,h2') || s.querySelector('.kicker')).textContent.replace(/\s+/g, ' ').trim()} → ${s.dataset.wiki.replace(/,/g, '、')}</div>`).join('');
 let cur = Math.max(0, Math.min(slides.length - 1, (parseInt(location.hash.slice(1)) || 1) - 1));
 function show(n) {
   cur = Math.max(0, Math.min(slides.length - 1, n));
